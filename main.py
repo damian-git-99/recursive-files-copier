@@ -27,6 +27,7 @@ class MainWindow(QMainWindow):
       if self.worker is not None: return # ya hay archivos copiandose
       # source folder
       self.source_folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
+      if self.source_folder_path == '': return
       # to_folder_path
       self.to_folder_path = self.create_folder(self.source_folder_path)
       if self.to_folder_path is None: return
