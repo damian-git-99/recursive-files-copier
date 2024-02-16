@@ -44,11 +44,11 @@ class MainWindow(QMainWindow):
         folder_name = 'folder_' + self.generate_unique_name()
         folder_path = os.path.join(source_folder_path, '..', folder_name )
         os.makedirs(folder_path)
-        QMessageBox.information(self, 'Alerta', f'Todo el contenido va a ser copiado a la carpeta llamada {folder_name}')
+        QMessageBox.information(self, 'Alerta', f'All content will be copied to the folder: {folder_name}')
         return folder_path
       except OSError as e:
         QMessageBox.information(self, 'Error', f'Error: {e}')
-        print(f'Error al crear la carpeta: {e}')
+        print(f'Error creating folder: {e}')
     
     def generate_unique_name(self,length=5):
       characters = string.ascii_letters + string.digits
