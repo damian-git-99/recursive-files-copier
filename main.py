@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
         self.label.setText(str(value))
 
     def startCopy(self):
-      if self.worker is not None: return # ya hay archivos copiandose
+      if self.worker is not None: return # there are already files being copied
       # source folder
       self.source_folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
       if self.source_folder_path == '': return
@@ -43,7 +43,6 @@ class MainWindow(QMainWindow):
       try:
         folder_name = 'folder_' + self.generate_unique_name()
         folder_path = os.path.join(source_folder_path, '..', folder_name )
-        print(folder_path)
         os.makedirs(folder_path)
         QMessageBox.information(self, 'Alerta', f'Todo el contenido va a ser copiado a la carpeta llamada {folder_name}')
         return folder_path
