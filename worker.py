@@ -13,9 +13,10 @@ class Worker(QThread):
     self.cancel = False
   
   def run(self):
-    total = sum(len(files) for _, _, files in os.walk(self.source))
     progress = 0
     self.progress_changed.emit(progress)
+    total = self.count_images()
+    print('Total Files Founded: '+str(total))
     # shutil.copytree(self.source, self.to, ignore=shutil.ignore_patterns('*'))
     for root, dirs, files in os.walk(self.source):
       for file in files:
@@ -31,13 +32,21 @@ class Worker(QThread):
             self.progress_changed.emit(int(progress / total * 100))
     if not self.cancel:
         self.finished.emit()
-  
+
   def _get_unique_filename(self, filename):
     name, ext = os.path.splitext(filename)
     counter = 1
     while os.path.exists(f"{name}_{counter}{ext}"):
       counter += 1
     return f"{name}_{counter}{ext}"
+  
+  def count_images(self):
+    count = 0
+    for root, _, files in os.walk(self.source):
+      for file in files:
+        if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+          count += 1
+    return count
   
   def cancelCopy(self):
     self.cancel = True
