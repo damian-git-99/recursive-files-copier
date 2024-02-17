@@ -7,12 +7,12 @@ A GUI application built with PyQt that recursively scans a folder to copy all im
 `pip install -r requirements.txt`
 `python main.py`
 
-# Create Executable
+# Create Executable Windows
+
+`pip install cx-Freeze`
+`python setup.py build`
+
+# Create Executable Linux
 
 `pip install pyinstaller`
-
-### Windows `python -m PyInstaller --onefile --windowed --add-data "main.ui;."  .\main.py`
-
-### Windows with nuitka: `python -m nuitka  --mingw64 --windows-disable-console --include-data-file=main.ui=main.ui --enable-plugin=pyqt6 --follow-imports --standalone --remove-output --output-dir=dist .\main.py`
-
-### Linux `pyinstaller --onefile --windowed --add-data="main.ui:." main.py `
+`pyinstaller --onefile --windowed --add-data="main.ui:." main.py`
