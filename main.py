@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
       # start copying
       self.worker = Worker(self.source_folder_path, self.to_folder_path)
       self.worker.progress_changed.connect(self.update_progress)
+      self.worker.not_files_found.connect(self.not_files)
       self.worker.finished.connect(self.copy_finished)
       self.worker.start()
 
@@ -71,6 +72,9 @@ class MainWindow(QMainWindow):
         self.worker = None
         self.selectFolderButton.setEnabled(True)
         QMessageBox.information(self, 'Alert', 'The files have finished copying')
+    
+    def not_files(self):
+      QMessageBox.information(self, 'Alert', 'No file found to copy')
 
 
 if __name__ == "__main__":

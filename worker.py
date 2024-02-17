@@ -5,6 +5,7 @@ import os
 class Worker(QThread):
   finished = pyqtSignal()
   progress_changed = pyqtSignal(int)
+  not_files_found = pyqtSignal()
 
   def __init__(self, source: str, to: str):
     super().__init__()
@@ -17,6 +18,11 @@ class Worker(QThread):
     self.progress_changed.emit(progress)
     total = self.count_images()
     print('Total Files Founded: '+str(total))
+
+    if total == 0:
+      self.not_files_found.emit()
+      return
+
     for root, dirs, files in os.walk(self.source):
       for file in files:
         if self.cancel:
