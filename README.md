@@ -4,6 +4,7 @@ A GUI application built with PyQt that recursively scans a folder to copy all im
 
 # Run
 
+`pip install -r requirements.txt`
 `python main.py`
 
 # Create Executable
