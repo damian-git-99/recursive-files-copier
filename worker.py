@@ -17,7 +17,6 @@ class Worker(QThread):
     self.progress_changed.emit(progress)
     total = self.count_images()
     print('Total Files Founded: '+str(total))
-    # shutil.copytree(self.source, self.to, ignore=shutil.ignore_patterns('*'))
     for root, dirs, files in os.walk(self.source):
       for file in files:
         if self.cancel:
