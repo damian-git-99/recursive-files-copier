@@ -21,8 +21,9 @@ class MainController:
                 normalized_path = os.path.normpath(to_folder_path)
                 self.view.show_message('Info', f'All content will be copied to the folder: {normalized_path}')
                 self.view.show_progressBar()
+                self.view.selectButtonSetEnabled(False)
                 self.file_model.start_copy(source_folder_path, to_folder_path)
-        except Error as e:
+        except Exception as e:
             self.view.show_message('Error', f'Error: {e}')
             print(f'Error: {e}')
 

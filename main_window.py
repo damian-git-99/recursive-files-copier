@@ -11,6 +11,9 @@ class MainWindow(QMainWindow):
         uic.loadUi(absolute_path, self)
         self.progressBar.hide()
         self.show()
+    
+    def selectButtonSetEnabled(self, value: bool):
+        self.selectFolderButton.setEnabled(value)
 
     def get_source_folder_path(self):
         return QFileDialog.getExistingDirectory(self, 'Select Folder')

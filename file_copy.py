@@ -11,6 +11,7 @@ class FileCopy(QObject):
   
   def __init__(self):
     super().__init__()
+    self.copy_finished.connect(self.copy_finished_func)
     self.worker = None
 
   def start_copy(self,source_folder_path, to_folder_path):
@@ -25,6 +26,9 @@ class FileCopy(QObject):
     if self.is_copying_files() is False:
         self.worker.cancelCopy()
         self.worker = None
+  
+  def copy_finished_func(self):
+    self.worker = None
   
   def create_folder(self, source_folder_path: str):
       folder_name = 'folder_' + self.generate_unique_name()
