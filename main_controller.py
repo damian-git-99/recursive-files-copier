@@ -1,0 +1,33 @@
+from main_window import MainWindow
+from file_copy import FileCopy
+import os
+
+class MainController:
+
+    def __init__(self, view: MainWindow):
+        self.view = view
+        self.file_model = FileCopy()
+        self.view.selectFolderButton.clicked.connect(self.start_copy)
+        self.view.cancelPushButton.clicked.connect(self.cancel_copy)
+        self.file_model.progress_changed.connect(self.view.update_progressBar_progress)
+        self.file_model.not_files_found.connect(self.view.not_files)
+        self.file_model.copy_finished.connect(self.view.copy_finished)
+    
+    def start_copy(self):
+        try:
+            source_folder_path = self.view.get_source_folder_path()
+            to_folder_path = self.file_model.create_folder(source_folder_path)
+            if to_folder_path is not None and source_folder_path != '':
+                normalized_path = os.path.normpath(to_folder_path)
+                self.view.show_message('Info', f'All content will be copied to the folder: {normalized_path}')
+                self.view.show_progressBar()
+                self.file_model.start_copy(source_folder_path, to_folder_path)
+        except Error as e:
+            self.view.show_message('Error', f'Error: {e}')
+            print(f'Error: {e}')
+
+    def cancel_copy(self):
+        if self.file_model.is_copying_files() is False: return
+        response = self.view.show_alert()
+        if response: self.file_model.cancel_copy()
+    
