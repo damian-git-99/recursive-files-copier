@@ -1,11 +1,13 @@
 from PyQt6.QtWidgets import QMainWindow, QFileDialog, QMessageBox
 from PyQt6 import uic
 import os
+import sys
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        base_dir = os.path.dirname(os.path.abspath(__file__))
+        #base_dir = os.path.dirname(os.path.abspath(__file__))
+        base_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         filename = "main.ui"
         absolute_path = os.path.join(base_dir, filename)
         uic.loadUi(absolute_path, self)
