@@ -12,6 +12,7 @@ class MainController:
         self.file_model.progress_changed.connect(self.view.update_progressBar_progress)
         self.file_model.not_files_found.connect(self.view.not_files)
         self.file_model.copy_finished.connect(self.view.copy_finished)
+        self.file_model.copy_canceled.connect(self.view.copy_canceled)
     
     def start_copy(self):
         try:

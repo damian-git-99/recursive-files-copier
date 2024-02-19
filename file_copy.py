@@ -8,6 +8,7 @@ class FileCopy(QObject):
   progress_changed = pyqtSignal(int)
   not_files_found = pyqtSignal()
   copy_finished = pyqtSignal()
+  copy_canceled = pyqtSignal()
   
   def __init__(self):
     super().__init__()
@@ -20,16 +21,17 @@ class FileCopy(QObject):
     self.worker.progress_changed.connect(self.progress_changed)
     self.worker.not_files_found.connect(self.not_files_found)
     self.worker.finished.connect(self.copy_finished)
+    self.worker.copy_canceled.connect(self.copy_canceled)
     self.worker.start()
 
   def cancel_copy(self):
-    if self.is_copying_files() is False:
+    if self.is_copying_files():
         self.worker.cancelCopy()
         self.worker = None
   
   def copy_finished_func(self):
     self.worker = None
-  
+    
   def create_folder(self, source_folder_path: str):
       folder_name = 'folder_' + self.generate_unique_name()
       folder_path = os.path.join(source_folder_path, '..', folder_name )

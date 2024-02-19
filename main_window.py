@@ -29,6 +29,11 @@ class MainWindow(QMainWindow):
         self.selectFolderButton.setEnabled(True)
         QMessageBox.information(self, 'Alert', 'The files have finished copying')
     
+    def copy_canceled(self):
+        self.progressBar.setValue(0)
+        self.selectFolderButton.setEnabled(True)
+        QMessageBox.information(self, 'Alert', 'The process was canceled')
+    
     def not_files(self):
         QMessageBox.information(self, 'Alert', 'No file found to copy')
     

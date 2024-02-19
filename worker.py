@@ -6,6 +6,7 @@ class Worker(QThread):
   finished = pyqtSignal()
   progress_changed = pyqtSignal(int)
   not_files_found = pyqtSignal()
+  copy_canceled = pyqtSignal()
 
   def __init__(self, source: str, to: str):
     super().__init__()
@@ -26,6 +27,7 @@ class Worker(QThread):
     for root, dirs, files in os.walk(self.source):
       for file in files:
         if self.cancel:
+          self.copy_canceled.emit()
           return
         if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
             src_path = os.path.join(root, file)
