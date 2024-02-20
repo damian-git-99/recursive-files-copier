@@ -15,9 +15,9 @@ class FileCopy(QObject):
     self.copy_finished.connect(self.copy_finished_func)
     self.worker = None
 
-  def start_copy(self,source_folder_path, to_folder_path):
+  def start_copy(self,source_folder_path, to_folder_path, file_option):
     if self.is_copying_files(): return
-    self.worker = Worker(source_folder_path, to_folder_path)
+    self.worker = Worker(source_folder_path, to_folder_path, file_option)
     self.worker.progress_changed.connect(self.progress_changed)
     self.worker.not_files_found.connect(self.not_files_found)
     self.worker.finished.connect(self.copy_finished)

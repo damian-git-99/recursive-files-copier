@@ -17,13 +17,14 @@ class MainController:
     def start_copy(self):
         try:
             source_folder_path = self.view.get_source_folder_path()
+            file_option = self.view.get_filetype()
             to_folder_path = self.file_model.create_folder(source_folder_path)
             if to_folder_path is not None and source_folder_path != '':
                 normalized_path = os.path.normpath(to_folder_path)
                 self.view.show_message('Info', f'All content will be copied to the folder: {normalized_path}')
                 self.view.show_progressBar()
                 self.view.selectButtonSetEnabled(False)
-                self.file_model.start_copy(source_folder_path, to_folder_path)
+                self.file_model.start_copy(source_folder_path, to_folder_path, file_option)
         except Exception as e:
             self.view.show_message('Error', f'Error: {e}')
             print(f'Error: {e}')

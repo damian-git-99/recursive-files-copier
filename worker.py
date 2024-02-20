@@ -1,4 +1,5 @@
 from PyQt6.QtCore import QObject, QThread, pyqtSignal
+from file_options import FileOptions
 import shutil
 import os
 
@@ -8,11 +9,12 @@ class Worker(QThread):
   not_files_found = pyqtSignal()
   copy_canceled = pyqtSignal()
 
-  def __init__(self, source: str, to: str):
+  def __init__(self, source: str, to: str, file_option: FileOptions):
     super().__init__()
     self.source = source
     self.to = to
     self.cancel = False
+    self.file_options = file_option
   
   def run(self):
     progress = 0
@@ -39,9 +41,19 @@ class Worker(QThread):
             self.progress_changed.emit(int(progress / total * 100))      
     if not self.cancel:
         self.finished.emit()
-  
+        
   def should_handle_file(self, file):
-    return file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))
+    video_extensions = ('.mp4', '.avi', '.mov', '.wmv', '.mkv', '.flv', '.webm', '.mpeg', '.mpg', '.3gp', '.3g2', '.ogg')
+    image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp')
+    file_extensions: tuple
+    match self.file_options:
+      case FileOptions.IMAGES:
+        file_extensions = image_extensions
+      case FileOptions.VIDEOS:
+        file_extensions = video_extensions
+      case FileOptions.IMAGES_VIDEOS:
+        file_extensions = image_extensions + video_extensions
+    return file.lower().endswith(file_extensions)
 
   def _get_unique_filename(self, filename):
     name, ext = os.path.splitext(filename)
