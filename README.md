@@ -1,6 +1,6 @@
 # Recursive Files Copier
 
-A GUI application built with PyQt that recursively scans a folder to copy all images, exploring all subfolders within the main directory.
+A GUI application built with PyQt that recursively scans a folder to copy all images and videos, exploring all subfolders within the main directory.
 
 # Run
 
