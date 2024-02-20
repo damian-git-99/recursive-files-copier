@@ -1,6 +1,6 @@
-from main_window import MainWindow
-from file_copy import FileCopy
 import os
+from .main_window import MainWindow
+from .file_copy import FileCopy
 
 class MainController:
 

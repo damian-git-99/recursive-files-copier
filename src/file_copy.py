@@ -1,8 +1,8 @@
 from PyQt6.QtCore import QObject, pyqtSignal
-from worker import Worker
 import random
 import string
 import os
+from .worker import Worker
 
 class FileCopy(QObject):
   progress_changed = pyqtSignal(int)

@@ -1,7 +1,7 @@
 from PyQt6.QtCore import QObject, QThread, pyqtSignal
-from file_options import FileOptions
 import shutil
 import os
+from .file_options import FileOptions
 
 class Worker(QThread):
   finished = pyqtSignal()

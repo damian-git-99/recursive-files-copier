@@ -11,7 +11,7 @@ executables = [Executable("main.py", base=base)]
 options = {
     "build_exe": {
         "packages": [],
-        "include_files": ['./main.ui'],
+        "include_files": [('./src/main.ui', './src/main.ui')],
         'excludes': ['tkinter']
     },
 }
