@@ -29,16 +29,19 @@ class Worker(QThread):
         if self.cancel:
           self.copy_canceled.emit()
           return
-        if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+        if self.should_handle_file(file):
             src_path = os.path.join(root, file)
             dest_path = os.path.join(self.to, file)
             if os.path.exists(dest_path):
                 dest_path = self._get_unique_filename(dest_path)
             shutil.copyfile(src_path, dest_path)
             progress += 1
-            self.progress_changed.emit(int(progress / total * 100))
+            self.progress_changed.emit(int(progress / total * 100))      
     if not self.cancel:
         self.finished.emit()
+  
+  def should_handle_file(self, file):
+    return file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))
 
   def _get_unique_filename(self, filename):
     name, ext = os.path.splitext(filename)
@@ -51,7 +54,7 @@ class Worker(QThread):
     count = 0
     for root, _, files in os.walk(self.source):
       for file in files:
-        if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+        if self.should_handle_file(file):
           count += 1
     return count
   
