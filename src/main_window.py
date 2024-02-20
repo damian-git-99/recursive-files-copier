@@ -4,10 +4,11 @@ import os
 import sys
 from .file_options import FileOptions
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        #base_dir = os.path.dirname(os.path.abspath(__file__))
+        # base_dir = os.path.dirname(os.path.abspath(__file__))
         base_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
         filename = "src/main.ui"
         absolute_path = os.path.join(base_dir, filename)
@@ -15,51 +16,52 @@ class MainWindow(QMainWindow):
         self.progressBar.hide()
         self._init_Combo_box()
         self.show()
-    
+
     def _init_Combo_box(self):
         for file_option in FileOptions:
             self.comboBox.addItem(file_option.value)
-        
+
     def get_filetype(self):
         selected_value = self.comboBox.currentText()
         file_option = FileOptions(selected_value)
         return file_option
-    
+
     def selectButtonSetEnabled(self, value: bool):
         self.selectFolderButton.setEnabled(value)
 
     def get_source_folder_path(self):
-        return QFileDialog.getExistingDirectory(self, 'Select Folder')
+        return QFileDialog.getExistingDirectory(self, "Select Folder")
 
     def update_progressBar_progress(self, progress):
         self.progressBar.setValue(progress)
-    
+
     def show_progressBar(self):
         self.progressBar.show()
-    
+
     def copy_finished(self):
         self.progressBar.setValue(100)
         self.selectFolderButton.setEnabled(True)
-        self.show_message('Alert', 'The files have finished copying')
-    
+        self.show_message("Alert", "The files have finished copying")
+
     def copy_canceled(self):
         self.progressBar.setValue(0)
         self.selectFolderButton.setEnabled(True)
-        self.show_message('Alert', 'The process was canceled')
-    
+        self.show_message("Alert", "The process was canceled")
+
     def not_files(self):
         self.selectFolderButton.setEnabled(True)
-        self.show_message('Alert', 'No file found to copy')
-        
-    
+        self.show_message("Alert", "No file found to copy")
+
     def show_message(self, type_message: str, message: str):
-        QMessageBox.information(self, type_message , message)
-        
+        QMessageBox.information(self, type_message, message)
+
     def show_alert(self):
         alert = QMessageBox()
         alert.setIcon(QMessageBox.Icon.Question)
         alert.setText("Are you sure?")
-        alert.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        alert.setStandardButtons(
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
         alert.setDefaultButton(QMessageBox.StandardButton.No)
         response = alert.exec()
         if response == QMessageBox.StandardButton.Yes:
