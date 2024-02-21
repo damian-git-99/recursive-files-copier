@@ -3,6 +3,7 @@ import random
 import string
 import os
 from .worker import Worker
+from .file_options import FileOptions
 
 
 class FileCopy(QObject):
@@ -16,7 +17,7 @@ class FileCopy(QObject):
         self.copy_finished.connect(self.copy_finished_func)
         self.worker = None
 
-    def start_copy(self, source_folder_path, to_folder_path, file_option):
+    def start_copy(self, source_folder_path, to_folder_path, file_option: FileOptions):
         if self.is_copying_files():
             return
         self.worker = Worker(source_folder_path, to_folder_path, file_option)
