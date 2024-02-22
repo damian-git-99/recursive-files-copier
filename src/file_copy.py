@@ -40,7 +40,7 @@ class FileCopy(QObject):
         os.makedirs(folder_path)
         return folder_path
 
-    def generate_unique_name(self, length=5):
+    def _generate_unique_name(self, length=5):
         characters = string.ascii_letters + string.digits
         unique_name = "".join(random.choice(characters) for _ in range(length))
         return unique_name

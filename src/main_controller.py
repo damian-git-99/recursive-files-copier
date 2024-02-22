@@ -36,7 +36,7 @@ class MainController:
             print(f"Error: {e}")
 
     def cancel_copy(self):
-        if self.file_model.is_copying_files() is False:
+        if not self.file_model.is_copying_files():
             return
         response = self.view.show_alert()
         if response:
