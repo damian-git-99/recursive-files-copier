@@ -43,7 +43,7 @@ class Worker(QThread):
         if not self.cancel:
             self.finished.emit()
 
-    def _should_handle_file(self, file):
+    def _should_handle_file(self, filename: str):
         video_extensions = (
             ".mp4",
             ".avi",
@@ -67,7 +67,7 @@ class Worker(QThread):
                 file_extensions = video_extensions
             case FileOptions.IMAGES_VIDEOS:
                 file_extensions = image_extensions + video_extensions
-        return file.lower().endswith(file_extensions)
+        return filename.lower().endswith(file_extensions)
 
     def _get_unique_filename(self, filename):
         name, ext = os.path.splitext(filename)
