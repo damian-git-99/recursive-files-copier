@@ -35,7 +35,7 @@ class FileCopy(QObject):
         self.worker = None
 
     def create_folder(self, source_folder_path: str):
-        folder_name = "folder_" + self.generate_unique_name()
+        folder_name = "folder_" + self._generate_unique_name()
         folder_path = os.path.join(source_folder_path, "..", folder_name)
         os.makedirs(folder_path)
         return folder_path
