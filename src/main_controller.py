@@ -5,9 +5,9 @@ from .file_copy import FileCopy
 
 class MainController:
 
-    def __init__(self, view: MainWindow):
+    def __init__(self, view: MainWindow, file_model: FileCopy):
         self.view = view
-        self.file_model = FileCopy()
+        self.file_model = file_model
         self.view.selectFolderButton.clicked.connect(self.start_copy)
         self.view.cancelPushButton.clicked.connect(self.cancel_copy)
         self.file_model.progress_changed.connect(self.view.update_progressBar_progress)
