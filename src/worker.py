@@ -1,7 +1,7 @@
 from PyQt6.QtCore import QThread, pyqtSignal
 import shutil
 import os
-from .file_options import FileOptions
+from .file_options import FileOptions, image_extensions, video_extensions
 
 
 class Worker(QThread):
@@ -44,21 +44,6 @@ class Worker(QThread):
             self.finished.emit()
 
     def _should_handle_file(self, filename: str):
-        video_extensions = (
-            ".mp4",
-            ".avi",
-            ".mov",
-            ".wmv",
-            ".mkv",
-            ".flv",
-            ".webm",
-            ".mpeg",
-            ".mpg",
-            ".3gp",
-            ".3g2",
-            ".ogg",
-        )
-        image_extensions = (".png", ".jpg", ".jpeg", ".gif", ".bmp")
         file_extensions: tuple
         match self.file_options:
             case FileOptions.IMAGES:
