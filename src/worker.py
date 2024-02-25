@@ -32,7 +32,7 @@ class Worker(QThread):
                 if self.cancel:
                     self.copy_canceled.emit()
                     return
-                if self.should_handle_file(file):
+                if self._should_handle_file(file):
                     src_path = os.path.join(root, file)
                     dest_path = os.path.join(self.to, file)
                     if os.path.exists(dest_path):
@@ -43,7 +43,7 @@ class Worker(QThread):
         if not self.cancel:
             self.finished.emit()
 
-    def should_handle_file(self, file):
+    def _should_handle_file(self, file):
         video_extensions = (
             ".mp4",
             ".avi",
@@ -80,7 +80,7 @@ class Worker(QThread):
         count = 0
         for root, _, files in os.walk(self.source):
             for file in files:
-                if self.should_handle_file(file):
+                if self._should_handle_file(file):
                     count += 1
         return count
 
