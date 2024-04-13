@@ -20,7 +20,7 @@ class Worker(QThread):
     def run(self):
         progress = 0
         self.progress_changed.emit(progress)
-        total = self.count_images()
+        total = self.count_files()
         print("Total Files Founded: " + str(total))
 
         if total == 0:
@@ -61,7 +61,7 @@ class Worker(QThread):
             counter += 1
         return f"{name}_{counter}{ext}"
 
-    def count_images(self):
+    def count_files(self):
         count = 0
         for root, _, files in os.walk(self.source):
             for file in files:
