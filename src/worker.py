@@ -69,5 +69,5 @@ class Worker(QThread):
                     count += 1
         return count
 
-    def cancelCopy(self):
+    def cancel_copy(self):
         self.cancel = True

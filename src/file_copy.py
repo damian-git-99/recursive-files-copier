@@ -29,7 +29,7 @@ class FileCopy(QObject):
 
     def cancel_copy(self):
         if self.is_copying_files():
-            self.worker.cancelCopy()
+            self.worker.cancel_copy()
 
     def copy_finished_func(self):
         self.worker = None
