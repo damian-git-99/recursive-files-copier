@@ -46,10 +46,4 @@ class FileCopy(QObject):
         return unique_name
 
     def is_copying_files(self):
-        """
-        checks if a worker is currently copying files.
-        """
-        if self.worker is not None:
-            return True
-        else:
-            return False
+        return self.worker is not None
