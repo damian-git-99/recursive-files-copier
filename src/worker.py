@@ -20,7 +20,7 @@ class Worker(QThread):
     def run(self):
         progress = 0
         self.progress_changed.emit(progress)
-        total = self.count_files()
+        total = self.__count_files()
         print("Total Files Founded: " + str(total))
 
         if total == 0:
@@ -32,18 +32,18 @@ class Worker(QThread):
                 if self.cancel:
                     self.copy_canceled.emit()
                     return
-                if self._should_handle_file(file):
+                if self.__should_handle_file(file):
                     src_path = os.path.join(root, file)
                     dest_path = os.path.join(self.to, file)
                     if os.path.exists(dest_path):
-                        dest_path = self._get_unique_filename(dest_path)
+                        dest_path = self.__get_unique_filename(dest_path)
                     shutil.copyfile(src_path, dest_path)
                     progress += 1
                     self.progress_changed.emit(int(progress / total * 100))
         if not self.cancel:
             self.finished.emit()
 
-    def _should_handle_file(self, filename: str):
+    def __should_handle_file(self, filename: str):
         file_extensions: tuple
         match self.file_options:
             case FileOptions.IMAGES:
@@ -54,18 +54,18 @@ class Worker(QThread):
                 file_extensions = image_extensions + video_extensions
         return filename.lower().endswith(file_extensions)
 
-    def _get_unique_filename(self, filename):
+    def __get_unique_filename(self, filename):
         name, ext = os.path.splitext(filename)
         counter = 1
         while os.path.exists(f"{name}_{counter}{ext}"):
             counter += 1
         return f"{name}_{counter}{ext}"
 
-    def count_files(self):
+    def __count_files(self):
         count = 0
         for root, _, files in os.walk(self.source):
             for file in files:
-                if self._should_handle_file(file):
+                if self.__should_handle_file(file):
                     count += 1
         return count
 
