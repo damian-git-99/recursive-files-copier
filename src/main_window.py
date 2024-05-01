@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
         self.progressBar.setValue(progress)
 
     def show_progressBar(self):
+        self.progressBar.setValue(0)
         self.progressBar.show()
 
     def copy_finished(self):
