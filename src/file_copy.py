@@ -30,7 +30,7 @@ class FileCopy(QObject):
             self.not_files_found.emit()
             return None
 
-        to_folder_path = self.create_folder(self.source)
+        to_folder_path = self.__create_folder(self.source)
 
         self.worker = Worker(files, to_folder_path)
         self.worker.progress_changed.connect(self.progress_changed)
@@ -46,7 +46,7 @@ class FileCopy(QObject):
     def copy_finished_func(self):
         self.worker = None
 
-    def create_folder(self, source_folder_path: str):
+    def __create_folder(self, source_folder_path: str):
         folder_name = "folder_" + self.__generate_unique_name()
         folder_path = os.path.join(source_folder_path, "..", folder_name)
         os.makedirs(folder_path)
