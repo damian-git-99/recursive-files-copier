@@ -24,15 +24,15 @@ class FileCopy(QObject):
         if self.is_copying_files():
             return None
 
-        files = self.__find_files_to_copy()
+        absolute_path_files = self.__find_files_to_copy()
 
-        if not files:
+        if not absolute_path_files:
             self.not_files_found.emit()
             return None
 
         to_folder_path = self.__create_folder(self.source)
 
-        self.worker = Worker(files, to_folder_path)
+        self.worker = Worker(absolute_path_files, to_folder_path)
         self.worker.progress_changed.connect(self.progress_changed)
         self.worker.finished.connect(self.copy_finished)
         self.worker.copy_canceled.connect(self.copy_canceled)
@@ -62,10 +62,10 @@ class FileCopy(QObject):
 
     def __find_files_to_copy(self) -> list:
         """
-        Finds and returns a list of files in the source directory that should be copied.
+        finds and returns a list of absolute file paths in the source directory that should be copied.
 
         Returns:
-            list: A list of file names that should be copied.
+            list: A list of absolute file paths that should be copied.
         """
         files_to_copy = []
         for root, _, files in os.walk(self.source):
