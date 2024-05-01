@@ -20,6 +20,8 @@ class MainController:
             source_folder_path = self.view.get_source_folder_path()
             file_option = self.view.get_filetype()
             if source_folder_path:
+                # check files count
+
                 to_folder_path = self.file_model.create_folder(source_folder_path)
                 normalized_path = os.path.normpath(to_folder_path)
                 self.view.show_message(
