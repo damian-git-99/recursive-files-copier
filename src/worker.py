@@ -9,18 +9,18 @@ class Worker(QThread):
     not_files_found = pyqtSignal()
     copy_canceled = pyqtSignal()
 
-    def __init__(self, files: list, to: str):
+    def __init__(self, absolute_path_files: list, to: str):
         super().__init__()
         self.to = to
         self.cancel = False
-        self.files = files
+        self.absolute_path_files = absolute_path_files
 
     def run(self):
         progress = 0
         self.progress_changed.emit(progress)
-        total = len(self.files)
+        total = len(self.absolute_path_files)
 
-        for file in self.files:
+        for file in self.absolute_path_files:
             if self.cancel:
                 self.copy_canceled.emit()
                 return
