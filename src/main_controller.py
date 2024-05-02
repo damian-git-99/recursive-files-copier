@@ -1,4 +1,3 @@
-import os
 from .main_window import MainWindow
 from .file_copy import FileCopy
 
@@ -14,27 +13,18 @@ class MainController:
         self.file_model.not_files_found.connect(self.view.not_files)
         self.file_model.copy_finished.connect(self.view.copy_finished)
         self.file_model.copy_canceled.connect(self.view.copy_canceled)
+        self.file_model.show_message.connect(self.show_message_view)
 
     def start_copy(self):
-        try:
-            source_folder_path = self.view.get_source_folder_path()
-            file_option = self.view.get_filetype()
+        source_folder_path = self.view.get_source_folder_path()
+        file_option = self.view.get_filetype()
 
-            if not source_folder_path:
-                return
+        if not source_folder_path:
+            return
 
-            self.view.show_progressBar()
-            self.view.selectButtonSetEnabled(False)
-            to_folder_path = self.file_model.start_copy(source_folder_path, file_option)
-            if to_folder_path is not None:
-                normalized_path = os.path.normpath(to_folder_path)
-                self.view.show_message(
-                    "Info",
-                    f"All content will be copied to the folder: {normalized_path}",
-                )
-        except Exception as e:
-            self.view.show_message("Error", f"Error: {e}")
-            print(f"Error: {e}")
+        self.view.show_progressBar()
+        self.view.selectButtonSetEnabled(False)
+        self.file_model.start_copy(source_folder_path, file_option)
 
     def cancel_copy(self):
         if not self.file_model.is_copying_files():
@@ -42,3 +32,8 @@ class MainController:
         response = self.view.show_alert()
         if response:
             self.file_model.cancel_copy()
+
+    def show_message_view(self, dict):
+        type_message = dict["type_message"]
+        message = dict["message"]
+        self.view.show_message(type_message, message)

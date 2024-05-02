@@ -11,6 +11,7 @@ class FileCopy(QObject):
     not_files_found = pyqtSignal()
     copy_finished = pyqtSignal()
     copy_canceled = pyqtSignal()
+    show_message = pyqtSignal(dict)
 
     def __init__(self):
         super().__init__()
@@ -22,18 +23,25 @@ class FileCopy(QObject):
         self.source = source
 
         if self.is_copying_files():
-            return None
+            return
 
         absolute_path_files = self.__find_files_to_copy()
 
         if not absolute_path_files:
             self.not_files_found.emit()
-            return None
+            return
 
         to_folder_path = self.__create_folder(self.source)
 
         if to_folder_path is None:
-            return None
+            return
+
+        self.show_message.emit(
+            {
+                "type_message": "Info",
+                "message": f"All content will be copied to the folder: {to_folder_path}",
+            }
+        )
 
         self.worker = Worker(absolute_path_files, to_folder_path)
         self.worker.progress_changed.connect(self.progress_changed)
@@ -54,9 +62,12 @@ class FileCopy(QObject):
         folder_path = os.path.join(source_folder_path, "..", folder_name)
         try:
             os.makedirs(folder_path)
-            return folder_path
+            normalized_path = os.path.normpath(folder_path)
+            return normalized_path
         except OSError as e:
-            print(f"Could not create folder: {e}")
+            self.show_message.emit(
+                {"type_message": "error", "message": f"Could not create folder: {e}"}
+            )
             return None
 
     def __generate_unique_name(self, length=5):
