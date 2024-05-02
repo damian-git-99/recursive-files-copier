@@ -26,18 +26,19 @@ class FileCopy(QObject):
         if self.is_copying_files():
             return
 
-        absolute_path_files = self.__find_files_to_copy()
-
-        if not absolute_path_files:
-            self.not_files_found.emit()
-            return
-
         to_folder_path = self.__create_folder(self.source)
 
         if to_folder_path is None:
             return
 
         self.to_folder_path = to_folder_path
+        absolute_path_files = self.__find_files_to_copy()
+
+        if not absolute_path_files:
+            # the folder that was created is deleted
+            os.rmdir(to_folder_path)
+            self.not_files_found.emit()
+            return
 
         self.show_message.emit(
             {
@@ -71,11 +72,10 @@ class FileCopy(QObject):
 
     def __create_folder(self, source_folder_path: str):
         folder_name = "folder_" + self.__generate_unique_name()
-        folder_path = os.path.join(source_folder_path, "..", folder_name)
+        folder_path = os.path.join(source_folder_path, folder_name)
         try:
             os.makedirs(folder_path)
-            normalized_path = os.path.normpath(folder_path)
-            return normalized_path
+            return folder_path
         except OSError as e:
             self.show_message.emit(
                 {"type_message": "error", "message": f"Could not create folder: {e}"}
@@ -99,6 +99,9 @@ class FileCopy(QObject):
         """
         files_to_copy = []
         for root, _, files in os.walk(self.source):
+            if root == self.to_folder_path:
+                # avoid the folder that was created
+                continue
             for file in files:
                 if self.__should_handle_file(file):
                     abs_path = os.path.join(root, file)
