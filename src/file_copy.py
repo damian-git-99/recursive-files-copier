@@ -2,6 +2,7 @@ from PyQt6.QtCore import QObject, pyqtSignal
 import random
 import string
 import os
+import platform
 from .worker import Worker
 from .file_options import FileOptions, image_extensions, video_extensions
 
@@ -48,7 +49,7 @@ class FileCopy(QObject):
         self.worker.finished.connect(self.copy_finished)
         self.worker.copy_canceled.connect(self.copy_canceled)
         self.worker.start()
-        return to_folder_path
+        self.to_folder_path = to_folder_path
 
     def cancel_copy(self):
         if self.is_copying_files():
@@ -56,6 +57,16 @@ class FileCopy(QObject):
 
     def copy_finished_func(self):
         self.worker = None
+        self.__open_folder(self.to_folder_path)
+
+    def __open_folder(self, folder_path):
+        operating_system = platform.system()
+        if operating_system == "Windows":
+            os.startfile(folder_path)
+        elif operating_system == "Linux":
+            os.system('xdg-open "{}"'.format(folder_path))
+        else:
+            print("Unsupported operating system.")
 
     def __create_folder(self, source_folder_path: str):
         folder_name = "folder_" + self.__generate_unique_name()
