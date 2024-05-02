@@ -37,6 +37,8 @@ class FileCopy(QObject):
         if to_folder_path is None:
             return
 
+        self.to_folder_path = to_folder_path
+
         self.show_message.emit(
             {
                 "type_message": "Info",
@@ -49,7 +51,6 @@ class FileCopy(QObject):
         self.worker.finished.connect(self.copy_finished)
         self.worker.copy_canceled.connect(self.copy_canceled)
         self.worker.start()
-        self.to_folder_path = to_folder_path
 
     def cancel_copy(self):
         if self.is_copying_files():
