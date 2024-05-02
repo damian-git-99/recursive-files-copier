@@ -32,6 +32,9 @@ class FileCopy(QObject):
 
         to_folder_path = self.__create_folder(self.source)
 
+        if to_folder_path is None:
+            return None
+
         self.worker = Worker(absolute_path_files, to_folder_path)
         self.worker.progress_changed.connect(self.progress_changed)
         self.worker.finished.connect(self.copy_finished)
@@ -49,8 +52,12 @@ class FileCopy(QObject):
     def __create_folder(self, source_folder_path: str):
         folder_name = "folder_" + self.__generate_unique_name()
         folder_path = os.path.join(source_folder_path, "..", folder_name)
-        os.makedirs(folder_path)
-        return folder_path
+        try:
+            os.makedirs(folder_path)
+            return folder_path
+        except OSError as e:
+            print(f"Could not create folder: {e}")
+            return None
 
     def __generate_unique_name(self, length=5):
         characters = string.ascii_letters + string.digits
