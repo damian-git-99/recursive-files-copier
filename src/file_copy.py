@@ -16,7 +16,7 @@ class FileCopy(QObject):
 
     def __init__(self):
         super().__init__()
-        self.copy_finished.connect(self.copy_finished_func)
+        self.copy_finished.connect(self.__copy_finished_func)
         self.worker = None
 
     def start_copy(self, source, file_options: FileOptions):
@@ -49,7 +49,7 @@ class FileCopy(QObject):
     def is_copying_files(self):
         return self.worker is not None
 
-    def copy_finished_func(self):
+    def __copy_finished_func(self):
         self.worker = None
         self.__open_folder(self.to_folder_path)
 
