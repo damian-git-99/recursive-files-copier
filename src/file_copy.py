@@ -40,13 +40,15 @@ class FileCopy(QObject):
             self.not_files_found.emit()
             return
 
+        self.__start_thread_copy(to_folder_path, absolute_path_files)
+
+    def __start_thread_copy(self, to_folder_path, absolute_path_files):
         self.show_message.emit(
             {
                 "type_message": "Info",
                 "message": f"All content will be copied to the folder: {to_folder_path}",
             }
         )
-
         self.worker = Worker(absolute_path_files, to_folder_path)
         self.worker.progress_changed.connect(self.progress_changed)
         self.worker.finished.connect(self.copy_finished)
