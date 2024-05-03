@@ -42,6 +42,17 @@ class FileCopy(QObject):
 
         self.__start_thread_copy(to_folder_path, absolute_path_files)
 
+    def cancel_copy(self):
+        if self.is_copying_files():
+            self.worker.cancel_copy()
+
+    def is_copying_files(self):
+        return self.worker is not None
+
+    def copy_finished_func(self):
+        self.worker = None
+        self.__open_folder(self.to_folder_path)
+
     def __start_thread_copy(self, to_folder_path, absolute_path_files):
         self.show_message.emit(
             {
@@ -54,14 +65,6 @@ class FileCopy(QObject):
         self.worker.finished.connect(self.copy_finished)
         self.worker.copy_canceled.connect(self.copy_canceled)
         self.worker.start()
-
-    def cancel_copy(self):
-        if self.is_copying_files():
-            self.worker.cancel_copy()
-
-    def copy_finished_func(self):
-        self.worker = None
-        self.__open_folder(self.to_folder_path)
 
     def __open_folder(self, folder_path):
         operating_system = platform.system()
@@ -88,9 +91,6 @@ class FileCopy(QObject):
         characters = string.ascii_letters + string.digits
         unique_name = "".join(random.choice(characters) for _ in range(length))
         return unique_name
-
-    def is_copying_files(self):
-        return self.worker is not None
 
     def __find_files_to_copy(self) -> list:
         """
