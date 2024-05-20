@@ -16,7 +16,7 @@ class FileCopy(QObject):
 
     def __init__(self):
         super().__init__()
-        self.copy_finished.connect(self.copy_finished_func)
+        self.copy_finished.connect(self.__copy_finished_func)
         self.worker = None
 
     def start_copy(self, source, file_options: FileOptions):
@@ -40,13 +40,26 @@ class FileCopy(QObject):
             self.not_files_found.emit()
             return
 
+        self.__start_thread_copy(to_folder_path, absolute_path_files)
+
+    def cancel_copy(self):
+        if self.is_copying_files():
+            self.worker.cancel_copy()
+
+    def is_copying_files(self):
+        return self.worker is not None
+
+    def __copy_finished_func(self):
+        self.worker = None
+        self.__open_folder(self.to_folder_path)
+
+    def __start_thread_copy(self, to_folder_path, absolute_path_files):
         self.show_message.emit(
             {
                 "type_message": "Info",
                 "message": f"All content will be copied to the folder: {to_folder_path}",
             }
         )
-
         self.worker = Worker(absolute_path_files, to_folder_path)
         self.worker.progress_changed.connect(self.progress_changed)
         self.worker.finished.connect(self.copy_finished)
@@ -58,10 +71,6 @@ class FileCopy(QObject):
         self.worker.wait()
         self.worker = None
         self.copy_canceled.emit()
-
-    def cancel_copy(self):
-        if self.is_copying_files():
-            self.worker.cancel_copy()
 
     def copy_finished_func(self):
         self.worker.quit()
@@ -94,11 +103,6 @@ class FileCopy(QObject):
         characters = string.ascii_letters + string.digits
         unique_name = "".join(random.choice(characters) for _ in range(length))
         return unique_name
-
-    def is_copying_files(self):
-        if self.worker is None:
-            return False
-        return not self.worker.isFinished()
 
     def __find_files_to_copy(self) -> list:
         """
