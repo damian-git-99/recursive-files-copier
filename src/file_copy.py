@@ -50,14 +50,22 @@ class FileCopy(QObject):
         self.worker = Worker(absolute_path_files, to_folder_path)
         self.worker.progress_changed.connect(self.progress_changed)
         self.worker.finished.connect(self.copy_finished)
-        self.worker.copy_canceled.connect(self.copy_canceled)
+        self.worker.copy_canceled.connect(self.__cancel_copy_emit)
         self.worker.start()
+
+    def __cancel_copy_emit(self):
+        self.worker.quit()
+        self.worker.wait()
+        self.worker = None
+        self.copy_canceled.emit()
 
     def cancel_copy(self):
         if self.is_copying_files():
             self.worker.cancel_copy()
 
     def copy_finished_func(self):
+        self.worker.quit()
+        self.worker.wait()
         self.worker = None
         self.__open_folder(self.to_folder_path)
 
@@ -88,7 +96,9 @@ class FileCopy(QObject):
         return unique_name
 
     def is_copying_files(self):
-        return self.worker is not None
+        if self.worker is None:
+            return False
+        return not self.worker.isFinished()
 
     def __find_files_to_copy(self) -> list:
         """
