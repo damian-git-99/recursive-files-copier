@@ -1,5 +1,5 @@
 from .main_window import MainWindow
-from .file_copy import FileCopy
+from .file_copy import FileCopy, CopyOptions
 
 
 class MainController:
@@ -17,14 +17,16 @@ class MainController:
 
     def start_copy(self):
         source_folder_path = self.view.get_source_folder_path()
-        file_option = self.view.get_filetype()
+        file_type = self.view.get_filetype()
+        compress_after_copy = self.view.compressCheckBox.isChecked()
 
         if not source_folder_path:
             return
 
+        copy_options = CopyOptions(source_folder_path, file_type, compress_after_copy)
         self.view.show_progressBar()
         self.view.selectButtonSetEnabled(False)
-        self.file_model.start_copy(source_folder_path, file_option)
+        self.file_model.start_copy(copy_options)
 
     def cancel_copy(self):
         if not self.file_model.is_copying_files():
