@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class FileOptions(Enum):
+class FileType(Enum):
     IMAGES = "Images"
     VIDEOS = "Videos"
     IMAGES_VIDEOS = "Images + Videos"

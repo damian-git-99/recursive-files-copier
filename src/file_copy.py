@@ -4,7 +4,7 @@ import string
 import os
 import platform
 from .worker import Worker
-from .file_options import FileOptions, image_extensions, video_extensions
+from .file_options import FileType, image_extensions, video_extensions
 
 
 class FileCopy(QObject):
@@ -19,8 +19,8 @@ class FileCopy(QObject):
         self.copy_finished.connect(self.__copy_finished_func)
         self.worker = None
 
-    def start_copy(self, source, file_options: FileOptions):
-        self.file_options = file_options
+    def start_copy(self, source, file_type: FileType):
+        self.file_type = file_type
         self.source = source
 
         if self.is_copying_files():
@@ -124,11 +124,11 @@ class FileCopy(QObject):
 
     def __should_handle_file(self, filename: str):
         file_extensions: tuple
-        match self.file_options:
-            case FileOptions.IMAGES:
+        match self.file_type:
+            case FileType.IMAGES:
                 file_extensions = image_extensions
-            case FileOptions.VIDEOS:
+            case FileType.VIDEOS:
                 file_extensions = video_extensions
-            case FileOptions.IMAGES_VIDEOS:
+            case FileType.IMAGES_VIDEOS:
                 file_extensions = image_extensions + video_extensions
         return filename.lower().endswith(file_extensions)

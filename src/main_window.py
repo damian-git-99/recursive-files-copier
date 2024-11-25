@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QMainWindow, QFileDialog, QMessageBox
 from PyQt6 import uic
 import os
 import sys
-from .file_options import FileOptions
+from .file_options import FileType
 
 
 class MainWindow(QMainWindow):
@@ -18,13 +18,13 @@ class MainWindow(QMainWindow):
         self.show()
 
     def _init_Combo_box(self):
-        for file_option in FileOptions:
-            self.comboBox.addItem(file_option.value)
+        for file_type in FileType:
+            self.comboBox.addItem(file_type.value)
 
     def get_filetype(self):
         selected_value = self.comboBox.currentText()
-        file_option = FileOptions(selected_value)
-        return file_option
+        file_type = FileType(selected_value)
+        return file_type
 
     def selectButtonSetEnabled(self, value: bool):
         self.selectFolderButton.setEnabled(value)
