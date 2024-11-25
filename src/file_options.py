@@ -1,4 +1,5 @@
 from enum import Enum
+from dataclasses import dataclass
 
 
 class FileType(Enum):
@@ -22,3 +23,10 @@ video_extensions = (
     ".ogg",
 )
 image_extensions = (".png", ".jpg", ".jpeg", ".gif", ".bmp")
+
+
+@dataclass
+class CopyOptions:
+    source: str
+    file_type: FileType = FileType.IMAGES
+    compress_after_copy: bool = False
