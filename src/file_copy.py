@@ -4,7 +4,7 @@ import string
 import os
 import platform
 from .worker import Worker
-from .file_options import FileOptions, image_extensions, video_extensions
+from .file_options import FileType, CopyOptions, image_extensions, video_extensions
 
 
 class FileCopy(QObject):
@@ -19,9 +19,10 @@ class FileCopy(QObject):
         self.copy_finished.connect(self.__copy_finished_func)
         self.worker = None
 
-    def start_copy(self, source, file_options: FileOptions):
-        self.file_options = file_options
-        self.source = source
+    def start_copy(self, copy_options: CopyOptions):
+        self.file_type = copy_options.file_type
+        self.source = copy_options.source
+        self.compress_after_copy = copy_options.compress_after_copy
 
         if self.is_copying_files():
             return
@@ -60,7 +61,9 @@ class FileCopy(QObject):
                 "message": f"All content will be copied to the folder: {to_folder_path}",
             }
         )
-        self.worker = Worker(absolute_path_files, to_folder_path)
+        self.worker = Worker(
+            absolute_path_files, to_folder_path, self.compress_after_copy
+        )
         self.worker.progress_changed.connect(self.progress_changed)
         self.worker.finished.connect(self.copy_finished)
         self.worker.copy_canceled.connect(self.__cancel_copy_emit)
@@ -72,6 +75,7 @@ class FileCopy(QObject):
         self.worker = None
         self.copy_canceled.emit()
 
+    # TODO: Remove ???
     def copy_finished_func(self):
         self.worker.quit()
         self.worker.wait()
@@ -124,11 +128,11 @@ class FileCopy(QObject):
 
     def __should_handle_file(self, filename: str):
         file_extensions: tuple
-        match self.file_options:
-            case FileOptions.IMAGES:
+        match self.file_type:
+            case FileType.IMAGES:
                 file_extensions = image_extensions
-            case FileOptions.VIDEOS:
+            case FileType.VIDEOS:
                 file_extensions = video_extensions
-            case FileOptions.IMAGES_VIDEOS:
+            case FileType.IMAGES_VIDEOS:
                 file_extensions = image_extensions + video_extensions
         return filename.lower().endswith(file_extensions)
