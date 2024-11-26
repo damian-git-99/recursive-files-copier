@@ -17,35 +17,38 @@ class MainController:
         self.file_model.show_message.connect(self.show_message_view)
 
     def start_copy(self):
-        source_folder_path = self.view.get_source_folder_path()
-        file_type = self.view.get_filetype()
-        custom_file_types = self.view.get_custom_file_types()
-        compress_after_copy = self.view.compressCheckBox.isChecked()
-        pattern = r"^(\.[a-zA-Z0-9]+)(\s(\.[a-zA-Z0-9]+))*$"
+        try:
+            source_folder_path = self.view.get_source_folder_path()
+            file_type = self.view.get_filetype()
+            custom_file_types = self.view.get_custom_file_types()
+            compress_after_copy = self.view.compressCheckBox.isChecked()
+            pattern = r"^(\.[a-zA-Z0-9]+)(\s(\.[a-zA-Z0-9]+))*$"
 
-        if (
-            file_type == FileType.CUSTOM
-            and not custom_file_types
-            or not re.match(pattern, custom_file_types)
-        ):
-            self.view.show_message(
-                "Alert",
-                "Please enter the file extensions to copy (separated by spaces)",
+            if (
+                file_type == FileType.CUSTOM
+                and not custom_file_types
+                or not re.match(pattern, custom_file_types)
+            ):
+                self.view.show_message(
+                    "Alert",
+                    "Please enter the file extensions to copy (separated by spaces)",
+                )
+                return
+
+            if not source_folder_path:
+                return
+
+            copy_options = CopyOptions(
+                source_folder_path,
+                file_type,
+                compress_after_copy,
+                self.convert_file_type_to_list(custom_file_types),
             )
-            return
-
-        if not source_folder_path:
-            return
-
-        copy_options = CopyOptions(
-            source_folder_path,
-            file_type,
-            compress_after_copy,
-            self.convert_file_type_to_list(custom_file_types),
-        )
-        self.view.show_progressBar()
-        self.view.selectButtonSetEnabled(False)
-        self.file_model.start_copy(copy_options)
+            self.view.show_progressBar()
+            self.view.selectButtonSetEnabled(False)
+            self.file_model.start_copy(copy_options)
+        except Exception as e:
+            self.view.show_message("Error", str(e))
 
     def cancel_copy(self):
         try:
