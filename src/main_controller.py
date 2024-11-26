@@ -22,18 +22,8 @@ class MainController:
             file_type = self.view.get_filetype()
             custom_file_types = self.view.get_custom_file_types()
             compress_after_copy = self.view.compressCheckBox.isChecked()
-            pattern = r"^(\.[a-zA-Z0-9]+)(\s(\.[a-zA-Z0-9]+))*$"
 
-            if (
-                file_type == FileType.CUSTOM
-                and not custom_file_types
-                or not re.match(pattern, custom_file_types)
-            ):
-                self.view.show_message(
-                    "Alert",
-                    "Please enter the file extensions to copy (separated by spaces)",
-                )
-                return
+            self.__validate_custom_file_types(file_type, custom_file_types)
 
             if not source_folder_path:
                 return
@@ -42,7 +32,7 @@ class MainController:
                 source_folder_path,
                 file_type,
                 compress_after_copy,
-                self.convert_file_type_to_list(custom_file_types),
+                self.__convert_file_type_to_list(custom_file_types),
             )
             self.view.show_progressBar()
             self.view.selectButtonSetEnabled(False)
@@ -65,5 +55,17 @@ class MainController:
         message = dict["message"]
         self.view.show_message(type_message, message)
 
-    def convert_file_type_to_list(self, text: str):
+    def __convert_file_type_to_list(self, text: str):
         return text.split(" ")
+
+    def __validate_custom_file_types(self, file_type: FileType, custom_file_types: str):
+        pattern = r"^(\.[a-zA-Z0-9]+)(\s(\.[a-zA-Z0-9]+))*$"
+        if file_type == FileType.CUSTOM and not custom_file_types:
+            raise Exception(
+                "Please enter the file extensions to copy (separated by spaces)"
+            )
+
+        if not re.match(pattern, custom_file_types):
+            raise Exception(
+                "Please enter the file extensions to copy (separated by spaces)"
+            )
