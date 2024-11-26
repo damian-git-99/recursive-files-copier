@@ -76,13 +76,6 @@ class FileCopy(QObject):
         self.copy_thread = None
         self.copy_canceled.emit()
 
-    # TODO: Remove ???
-    def copy_finished_func(self):
-        self.copy_thread.quit()
-        self.copy_thread.wait()
-        self.copy_thread = None
-        self.__open_folder(self.to_folder_path)
-
     def __open_folder(self, folder_path):
         operating_system = platform.system()
         if operating_system == "Windows":
