@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
         self.progressBar.show()
 
     def copy_finished(self):
-        self.progressBar.setValue(100)
+        self.progressBar.setValue(0)
         self.selectFolderButton.setEnabled(True)
         self.show_message("Alert", "The files have finished copying")
 
