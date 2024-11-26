@@ -48,11 +48,14 @@ class MainController:
         self.file_model.start_copy(copy_options)
 
     def cancel_copy(self):
-        if not self.file_model.is_copying_files():
-            return
-        response = self.view.show_alert()
-        if response:
-            self.file_model.cancel_copy()
+        try:
+            if not self.file_model.is_copying_files():
+                return
+            response = self.view.show_alert()
+            if response:
+                self.file_model.cancel_copy()
+        except Exception as e:
+            self.view.show_message("Error", str(e))
 
     def show_message_view(self, dict):
         type_message = dict["type_message"]
