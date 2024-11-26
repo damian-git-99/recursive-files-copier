@@ -38,6 +38,9 @@ class CopyOptions:
         self.file_type = file_type
         self.compress_after_copy = compress_after_copy
         self.custom_file_types = custom_file_types
-        if custom_file_types is None:
-            # TODO: Validate custom file types. example .txt .py .c
-            self.custom_file_types = custom_file_types.split(" ")
+
+    @property
+    def custom_file_types_list(self):
+        if self.custom_file_types is None:
+            return []
+        return self.custom_file_types.split(" ")
