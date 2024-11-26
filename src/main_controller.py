@@ -1,5 +1,6 @@
 from .main_window import MainWindow
 from .file_copy import FileCopy, CopyOptions, FileType
+import re
 
 
 class MainController:
@@ -20,10 +21,16 @@ class MainController:
         file_type = self.view.get_filetype()
         custom_file_types = self.view.get_custom_file_types()
         compress_after_copy = self.view.compressCheckBox.isChecked()
+        pattern = r"^(\.[a-zA-Z0-9]+)(\s(\.[a-zA-Z0-9]+))*$"
 
-        if file_type == FileType.CUSTOM and not custom_file_types:
+        if (
+            file_type == FileType.CUSTOM
+            and not custom_file_types
+            or not re.match(pattern, custom_file_types)
+        ):
             self.view.show_message(
-                "Alert", "Please enter the file types to copy (separated by spaces)"
+                "Alert",
+                "Please enter the file extensions to copy (separated by spaces)",
             )
             return
 
