@@ -3,7 +3,7 @@ import random
 import string
 import os
 import platform
-from .worker import CopyThread
+from .copy_thread import CopyThread
 from .file_options import FileType, CopyOptions, image_extensions, video_extensions
 
 
