@@ -88,14 +88,8 @@ class FileCopy(QObject):
     def __create_folder(self, source_folder_path: str):
         folder_name = "folder_" + self.__generate_unique_name()
         folder_path = os.path.join(source_folder_path, folder_name)
-        try:
-            os.makedirs(folder_path)
-            return folder_path
-        except OSError as e:
-            self.show_message.emit(
-                {"type_message": "error", "message": f"Could not create folder: {e}"}
-            )
-            return None
+        os.makedirs(folder_path)
+        return folder_path
 
     def __generate_unique_name(self, length=5):
         characters = string.ascii_letters + string.digits
