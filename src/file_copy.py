@@ -23,6 +23,7 @@ class FileCopy(QObject):
         self.file_type = copy_options.file_type
         self.source = copy_options.source
         self.compress_after_copy = copy_options.compress_after_copy
+        self.custom_file_types = copy_options.custom_file_types
 
         if self.is_copying_files():
             return
@@ -135,4 +136,6 @@ class FileCopy(QObject):
                 file_extensions = video_extensions
             case FileType.IMAGES_VIDEOS:
                 file_extensions = image_extensions + video_extensions
+            case FileType.CUSTOM:
+                file_extensions = self.custom_file_types
         return filename.lower().endswith(file_extensions)

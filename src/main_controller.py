@@ -18,12 +18,15 @@ class MainController:
     def start_copy(self):
         source_folder_path = self.view.get_source_folder_path()
         file_type = self.view.get_filetype()
+        custom_file_types = self.view.get_custom_file_types()
         compress_after_copy = self.view.compressCheckBox.isChecked()
 
         if not source_folder_path:
             return
 
-        copy_options = CopyOptions(source_folder_path, file_type, compress_after_copy)
+        copy_options = CopyOptions(
+            source_folder_path, file_type, compress_after_copy, custom_file_types
+        )
         self.view.show_progressBar()
         self.view.selectButtonSetEnabled(False)
         self.file_model.start_copy(copy_options)

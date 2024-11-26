@@ -14,17 +14,28 @@ class MainWindow(QMainWindow):
         absolute_path = os.path.join(base_dir, filename)
         uic.loadUi(absolute_path, self)
         self.progressBar.hide()
+        self.customLineEdit.hide()
         self._init_Combo_box()
         self.show()
 
     def _init_Combo_box(self):
+        self.comboBox.currentTextChanged.connect(self.on_combobox_changed)
         for file_type in FileType:
             self.comboBox.addItem(file_type.value)
+
+    def on_combobox_changed(self, text):
+        if text == "Custom":
+            self.customLineEdit.show()
+        else:
+            self.customLineEdit.hide()
 
     def get_filetype(self):
         selected_value = self.comboBox.currentText()
         file_type = FileType(selected_value)
         return file_type
+
+    def get_custom_file_types(self):
+        return self.customLineEdit.text()
 
     def selectButtonSetEnabled(self, value: bool):
         self.selectFolderButton.setEnabled(value)

@@ -30,7 +30,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>40</y>
+      <y>10</y>
       <width>181</width>
       <height>31</height>
      </rect>
@@ -98,6 +98,16 @@
     </property>
     <property name="text">
      <string>Compress after completion</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="customLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>50</y>
+      <width>181</width>
+      <height>20</height>
+     </rect>
     </property>
    </widget>
   </widget>
