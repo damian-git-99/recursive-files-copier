@@ -23,7 +23,7 @@ class CopyThread(QThread):
         total = len(self.absolute_path_files)
 
         if self.compress_after_copy:
-            # Crear un archivo ZIP para comprimir los archivos
+            existing_files_in_zip = []
             zip_filename = os.path.join(self.to, "compressed_files.zip")
             with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
                 for file in self.absolute_path_files:
@@ -31,8 +31,14 @@ class CopyThread(QThread):
                         self.copy_canceled.emit()
                         return
 
+                    # Verificar y generar un nombre único dentro del ZIP
                     filename = os.path.basename(file)
-                    zipf.write(file, filename)  # Comprimir el archivo en el archivo ZIP
+                    unique_filename = self.__get_unique_filename_zip(
+                        existing_files_in_zip, filename
+                    )
+
+                    zipf.write(file, unique_filename)
+                    existing_files_in_zip.append(unique_filename)
                     progress += 1
                     self.progress_changed.emit(int(progress / total * 100))
         else:
@@ -59,6 +65,16 @@ class CopyThread(QThread):
         while os.path.exists(f"{name}_{counter}{ext}"):
             counter += 1
         return f"{name}_{counter}{ext}"
+
+    def __get_unique_filename_zip(self, existing_files, original_name):
+        name, ext = os.path.splitext(original_name)
+        counter = 1
+
+        while f"{name}{ext}" in existing_files:
+            name = f"{name}_{counter}"
+            counter += 1
+
+        return f"{name}{ext}"
 
     def cancel_copy(self):
         self.cancel = True
