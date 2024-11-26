@@ -3,7 +3,7 @@ import random
 import string
 import os
 import platform
-from .worker import Worker
+from .worker import CopyThread
 from .file_options import FileType, CopyOptions, image_extensions, video_extensions
 
 
@@ -17,7 +17,7 @@ class FileCopy(QObject):
     def __init__(self):
         super().__init__()
         self.copy_finished.connect(self.__copy_finished_func)
-        self.worker = None
+        self.copy_thread = None
 
     def start_copy(self, copy_options: CopyOptions):
         self.file_type = copy_options.file_type
@@ -45,13 +45,13 @@ class FileCopy(QObject):
 
     def cancel_copy(self):
         if self.is_copying_files():
-            self.worker.cancel_copy()
+            self.copy_thread.cancel_copy()
 
     def is_copying_files(self):
-        return self.worker is not None
+        return self.copy_thread is not None
 
     def __copy_finished_func(self):
-        self.worker = None
+        self.copy_thread = None
         self.__open_folder(self.to_folder_path)
 
     def __start_thread_copy(self, to_folder_path, absolute_path_files):
@@ -61,25 +61,25 @@ class FileCopy(QObject):
                 "message": f"All content will be copied to the folder: {to_folder_path}",
             }
         )
-        self.worker = Worker(
+        self.copy_thread = CopyThread(
             absolute_path_files, to_folder_path, self.compress_after_copy
         )
-        self.worker.progress_changed.connect(self.progress_changed)
-        self.worker.finished.connect(self.copy_finished)
-        self.worker.copy_canceled.connect(self.__cancel_copy_emit)
-        self.worker.start()
+        self.copy_thread.progress_changed.connect(self.progress_changed)
+        self.copy_thread.finished.connect(self.copy_finished)
+        self.copy_thread.copy_canceled.connect(self.__cancel_copy_emit)
+        self.copy_thread.start()
 
     def __cancel_copy_emit(self):
-        self.worker.quit()
-        self.worker.wait()
-        self.worker = None
+        self.copy_thread.quit()
+        self.copy_thread.wait()
+        self.copy_thread = None
         self.copy_canceled.emit()
 
     # TODO: Remove ???
     def copy_finished_func(self):
-        self.worker.quit()
-        self.worker.wait()
-        self.worker = None
+        self.copy_thread.quit()
+        self.copy_thread.wait()
+        self.copy_thread = None
         self.__open_folder(self.to_folder_path)
 
     def __open_folder(self, folder_path):

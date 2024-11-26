@@ -4,7 +4,7 @@ import shutil
 import zipfile
 
 
-class Worker(QThread):
+class CopyThread(QThread):
     finished = pyqtSignal()
     progress_changed = pyqtSignal(int)
     not_files_found = pyqtSignal()
