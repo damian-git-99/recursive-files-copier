@@ -32,15 +32,9 @@ class CopyOptions:
         source: str,
         file_type: FileType = FileType.IMAGES,
         compress_after_copy: bool = False,
-        custom_file_types: str = None,
+        custom_file_types: [str] = [],
     ):
         self.source = source
         self.file_type = file_type
         self.compress_after_copy = compress_after_copy
         self.custom_file_types = custom_file_types
-
-    @property
-    def custom_file_types_list(self):
-        if self.custom_file_types is None:
-            return []
-        return self.custom_file_types.split(" ")

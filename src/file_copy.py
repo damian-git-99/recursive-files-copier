@@ -23,7 +23,7 @@ class FileCopy(QObject):
         self.file_type = copy_options.file_type
         self.source = copy_options.source
         self.compress_after_copy = copy_options.compress_after_copy
-        self.custom_file_types = copy_options.custom_file_types_list
+        self.custom_file_types = copy_options.custom_file_types
 
         if self.is_copying_files():
             return

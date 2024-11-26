@@ -1,5 +1,5 @@
 from .main_window import MainWindow
-from .file_copy import FileCopy, CopyOptions
+from .file_copy import FileCopy, CopyOptions, FileType
 
 
 class MainController:
@@ -21,11 +21,20 @@ class MainController:
         custom_file_types = self.view.get_custom_file_types()
         compress_after_copy = self.view.compressCheckBox.isChecked()
 
+        if file_type == FileType.CUSTOM and not custom_file_types:
+            self.view.show_message(
+                "Alert", "Please enter the file types to copy (separated by spaces)"
+            )
+            return
+
         if not source_folder_path:
             return
 
         copy_options = CopyOptions(
-            source_folder_path, file_type, compress_after_copy, custom_file_types
+            source_folder_path,
+            file_type,
+            compress_after_copy,
+            self.convert_file_type_to_list(custom_file_types),
         )
         self.view.show_progressBar()
         self.view.selectButtonSetEnabled(False)
@@ -42,3 +51,6 @@ class MainController:
         type_message = dict["type_message"]
         message = dict["message"]
         self.view.show_message(type_message, message)
+
+    def convert_file_type_to_list(self, text: str):
+        return text.split(" ")
