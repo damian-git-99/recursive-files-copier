@@ -34,7 +34,7 @@ class FileCopy(QObject):
             return
 
         self.to_folder_path = to_folder_path
-        absolute_path_files = self.__find_files_to_copy()
+        absolute_path_files = self.__find_files_to_copy(self.source, to_folder_path)
 
         if not absolute_path_files:
             # the folder that was created is deleted
@@ -96,7 +96,7 @@ class FileCopy(QObject):
         unique_name = "".join(random.choice(characters) for _ in range(length))
         return unique_name
 
-    def __find_files_to_copy(self) -> list:
+    def __find_files_to_copy(self, source_folder_path: str, to_folder_path: str) -> list:
         """
         finds and returns a list of absolute file paths in the source directory that should be copied.
 
@@ -104,8 +104,8 @@ class FileCopy(QObject):
             list: A list of absolute file paths that should be copied.
         """
         files_to_copy = []
-        for root, _, files in os.walk(self.source):
-            if root == self.to_folder_path:
+        for root, _, files in os.walk(source_folder_path):
+            if root == to_folder_path:
                 # avoid the folder that was created
                 continue
             for file in files:
