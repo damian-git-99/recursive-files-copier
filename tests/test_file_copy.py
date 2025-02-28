@@ -31,6 +31,24 @@ class TestFileCopy(unittest.TestCase):
                 f.write('test content')
             created_files.append(file_path)
         return created_files
+
+    def create_nested_directory(self, root_files, nested_files):
+        """Helper method to create a nested directory structure with files"""
+        # Create root files
+        root_paths = self.create_test_files(root_files)
+        
+        # Create nested directory and its files
+        nested_dir = os.path.join(self.temp_dir, 'nested')
+        os.makedirs(nested_dir)
+        nested_paths = []
+        
+        for file in nested_files:
+            file_path = os.path.join(nested_dir, file)
+            with open(file_path, 'w') as f:
+                f.write('test content')
+            nested_paths.append(file_path)
+            
+        return root_paths + nested_paths
             
     def test_should_handle_file_images(self):
         self.file_copy.file_type = FileType.IMAGES
@@ -79,74 +97,68 @@ class TestFileCopy(unittest.TestCase):
         # Test invalid extensions
         self.assertFalse(self.file_copy._FileCopy__should_handle_file('test.jpg'))
         self.assertFalse(self.file_copy._FileCopy__should_handle_file('test.mp4'))
+
+    def test_find_files_to_copy_empty_directory(self):
+        # Configure FileCopy
+        self.file_copy.file_type = FileType.IMAGES
+        dest_folder = os.path.join(self.temp_dir, 'dest')
         
-    @patch('src.file_copy.CopyThread')
-    def test_find_files_to_copy_images(self, mock_copy_thread):
-        # Setup
+        # Test with empty directory
+        found_files = self.file_copy._FileCopy__find_files_to_copy(self.temp_dir, dest_folder)
+        self.assertEqual(len(found_files), 0)
+        
+    def test_find_files_to_copy_with_mixed_files(self):
+        # Create test files
         test_files = ['test1.jpg', 'test2.png', 'test3.txt', 'test4.mp4']
         created_files = self.create_test_files(test_files)
         
         # Configure FileCopy
-        options = CopyOptions(
-            source=self.temp_dir,
-            file_type=FileType.IMAGES,
-            compress_after_copy=False,
-            custom_file_types=None
-        )
-        self.file_copy.start_copy(options)
+        self.file_copy.file_type = FileType.IMAGES
+        dest_folder = os.path.join(self.temp_dir, 'dest')
         
-        # Get the files that were found (excluding the created destination folder)
-        found_files = [f for f in self.file_copy._FileCopy__find_files_to_copy()]
+        # Get the files that were found
+        found_files = self.file_copy._FileCopy__find_files_to_copy(self.temp_dir, dest_folder)
         
         # We should only find the image files
-        expected_files = [f for f in created_files if f.endswith(('.jpg', '.png'))]
+        expected_files = [f for f in created_files if os.path.basename(f).lower().endswith(('.jpg', '.png'))]
         self.assertEqual(sorted(found_files), sorted(expected_files))
-        
-    @patch('src.file_copy.CopyThread')
-    def test_find_files_to_copy_empty_directory(self, mock_copy_thread):
-        # Configure FileCopy with empty directory
-        options = CopyOptions(
-            source=self.temp_dir,
-            file_type=FileType.IMAGES,
-            compress_after_copy=False,
-            custom_file_types=None
-        )
-        self.file_copy.start_copy(options)
-        
-        # Should find no files
-        found_files = self.file_copy._FileCopy__find_files_to_copy()
-        self.assertEqual(len(found_files), 0)
-        
-    @patch('src.file_copy.CopyThread')
-    def test_find_files_to_copy_nested_directories(self, mock_copy_thread):
-        # Create nested directory structure
-        nested_dir = os.path.join(self.temp_dir, 'nested')
-        os.makedirs(nested_dir)
-        
-        # Create files in both root and nested directory
+
+    def test_find_files_to_copy_nested_directories(self):
+        # Create nested directory structure with mixed file types
         root_files = ['root1.jpg', 'root2.txt']
-        nested_files = ['nested1.jpg', 'nested2.png']
-        
-        self.create_test_files(root_files)
-        for file in nested_files:
-            file_path = os.path.join(nested_dir, file)
-            with open(file_path, 'w') as f:
-                f.write('test content')
+        nested_files = ['nested1.jpg', 'nested2.png', 'nested3.txt']
+        all_files = self.create_nested_directory(root_files, nested_files)
         
         # Configure FileCopy
-        options = CopyOptions(
-            source=self.temp_dir,
-            file_type=FileType.IMAGES,
-            compress_after_copy=False,
-            custom_file_types=None
-        )
-        self.file_copy.start_copy(options)
+        self.file_copy.file_type = FileType.IMAGES
+        dest_folder = os.path.join(self.temp_dir, 'dest')
         
         # Get found files
-        found_files = self.file_copy._FileCopy__find_files_to_copy()
+        found_files = self.file_copy._FileCopy__find_files_to_copy(self.temp_dir, dest_folder)
         
-        # Should find both root and nested image files
-        self.assertEqual(len(found_files), 3)  # root1.jpg, nested1.jpg, nested2.png
-        self.assertTrue(any('root1.jpg' in f for f in found_files))
-        self.assertTrue(any('nested1.jpg' in f for f in found_files))
-        self.assertTrue(any('nested2.png' in f for f in found_files))
+        # Should find only image files from both directories
+        expected_files = [f for f in all_files if os.path.basename(f).lower().endswith(('.jpg', '.png'))]
+        self.assertEqual(sorted(found_files), sorted(expected_files))
+
+    def test_find_files_to_copy_excludes_destination(self):
+        # Create files in source
+        source_files = ['test1.jpg', 'test2.png']
+        source_paths = self.create_test_files(source_files)
+        
+        # Create destination folder with files that should be excluded
+        dest_folder = os.path.join(self.temp_dir, 'dest')
+        os.makedirs(dest_folder)
+        dest_file = os.path.join(dest_folder, 'dest.jpg')
+        with open(dest_file, 'w') as f:
+            f.write('test content')
+            
+        # Configure FileCopy
+        self.file_copy.file_type = FileType.IMAGES
+        
+        # Get found files
+        found_files = self.file_copy._FileCopy__find_files_to_copy(self.temp_dir, dest_folder)
+        
+        # Should only include source files, not destination files
+        self.assertEqual(sorted(found_files), sorted(source_paths))
+
+
