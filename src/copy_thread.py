@@ -31,7 +31,7 @@ class CopyThread(QThread):
                         self.copy_canceled.emit()
                         return
 
-                    # Verificar y generar un nombre único dentro del ZIP
+                    # Generate a unique filename within the ZIP
                     filename = os.path.basename(file)
                     unique_filename = self.__get_unique_filename_zip(
                         existing_files_in_zip, filename
