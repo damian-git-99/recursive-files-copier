@@ -20,44 +20,52 @@ class CopyThread(QThread):
     def run(self):
         progress = 0
         self.progress_changed.emit(progress)
-        total = len(self.absolute_path_files)
-
+        
         if self.compress_after_copy:
-            existing_files_in_zip = []
-            zip_filename = os.path.join(self.to, "compressed_files.zip")
-            with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
-                for file in self.absolute_path_files:
-                    if self.cancel:
-                        self.copy_canceled.emit()
-                        return
-
-                    # Generate a unique filename within the ZIP
-                    filename = os.path.basename(file)
-                    unique_filename = self.__get_unique_filename_zip(
-                        existing_files_in_zip, filename
-                    )
-
-                    zipf.write(file, unique_filename)
-                    existing_files_in_zip.append(unique_filename)
-                    progress += 1
-                    self.progress_changed.emit(int(progress / total * 100))
+            self._compress_files()
         else:
+            self._copy_files()
+
+        if not self.cancel:
+            self.finished.emit()
+
+    def _compress_files(self):
+        existing_files_in_zip = []
+        total = len(self.absolute_path_files)
+        progress = 0
+        
+        zip_filename = os.path.join(self.to, "compressed_files.zip")
+        with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
             for file in self.absolute_path_files:
                 if self.cancel:
                     self.copy_canceled.emit()
                     return
 
                 filename = os.path.basename(file)
-                dest_path = os.path.join(self.to, filename)
-                if os.path.exists(dest_path):
-                    dest_path = self.__get_unique_filename(dest_path)
+                unique_filename = self.__get_unique_filename_zip(existing_files_in_zip, filename)
 
-                shutil.copyfile(file, dest_path)
+                zipf.write(file, unique_filename)
+                existing_files_in_zip.append(unique_filename)
                 progress += 1
                 self.progress_changed.emit(int(progress / total * 100))
 
-        if not self.cancel:
-            self.finished.emit()
+    def _copy_files(self):
+        total = len(self.absolute_path_files)
+        progress = 0
+
+        for file in self.absolute_path_files:
+            if self.cancel:
+                self.copy_canceled.emit()
+                return
+
+            filename = os.path.basename(file)
+            dest_path = os.path.join(self.to, filename)
+            if os.path.exists(dest_path):
+                dest_path = self.__get_unique_filename(dest_path)
+
+            shutil.copyfile(file, dest_path)
+            progress += 1
+            self.progress_changed.emit(int(progress / total * 100))
 
     def __get_unique_filename(self, filename):
         name, ext = os.path.splitext(filename)
