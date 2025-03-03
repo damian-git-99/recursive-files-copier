@@ -42,7 +42,7 @@ class CopyThread(QThread):
                     return
 
                 filename = os.path.basename(file)
-                unique_filename = self.__get_unique_filename_zip(existing_files_in_zip, filename)
+                unique_filename = self._get_unique_filename_zip(existing_files_in_zip, filename)
 
                 zipf.write(file, unique_filename)
                 existing_files_in_zip.append(unique_filename)
@@ -61,20 +61,20 @@ class CopyThread(QThread):
             filename = os.path.basename(file)
             dest_path = os.path.join(self.to, filename)
             if os.path.exists(dest_path):
-                dest_path = self.__get_unique_filename(dest_path)
+                dest_path = self._get_unique_filename(dest_path)
 
             shutil.copyfile(file, dest_path)
             progress += 1
             self.progress_changed.emit(int(progress / total * 100))
 
-    def __get_unique_filename(self, filename):
+    def _get_unique_filename(self, filename):
         name, ext = os.path.splitext(filename)
         counter = 1
         while os.path.exists(f"{name}_{counter}{ext}"):
             counter += 1
         return f"{name}_{counter}{ext}"
 
-    def __get_unique_filename_zip(self, existing_files, original_name):
+    def _get_unique_filename_zip(self, existing_files, original_name):
         name, ext = os.path.splitext(original_name)
         counter = 1
 
