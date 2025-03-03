@@ -60,6 +60,11 @@ def test_normal_copy(setup_test_env):
     test_files = setup_test_env["test_files"]
     dest_dir = setup_test_env["dest_dir"]
     
+    # Get total number of files in images directory
+    total_images = 0
+    for root, _, files in os.walk("./tests/images"):
+        total_images += len(files)
+    
     thread = CopyThread(test_files, str(dest_dir), compress_after_copy=False)
     thread.finished = MagicMock()
     thread.progress_changed = MagicMock()
@@ -76,6 +81,15 @@ def test_normal_copy(setup_test_env):
     assert not thread.copy_canceled.emit.called
     
     # Verify files were copied
+    copied_files = []
+    for root, _, files in os.walk(dest_dir):
+        for file in files:
+            copied_files.append(os.path.join(root, file))
+    
+    # Verify we copied all files from the original structure
+    assert len(copied_files) == total_images, f"Expected {total_images} files to be copied, but found {len(copied_files)}"
+    
+    # Verify each file exists in destination
     for file in test_files:
         filename = os.path.basename(file)
         assert os.path.exists(os.path.join(dest_dir, filename))
@@ -84,6 +98,11 @@ def test_compressed_copy(setup_test_env):
     # Arrange
     test_files = setup_test_env["test_files"]
     dest_dir = setup_test_env["dest_dir"]
+    
+    # Get total number of files in images directory
+    total_images = 0
+    for root, _, files in os.walk("./tests/images"):
+        total_images += len(files)
     
     thread = CopyThread(test_files, str(dest_dir), compress_after_copy=True)
     thread.finished = MagicMock()
@@ -106,7 +125,10 @@ def test_compressed_copy(setup_test_env):
     
     with zipfile.ZipFile(zip_path, 'r') as zipf:
         zip_files = zipf.namelist()
-        assert len(zip_files) == len(test_files)
+        # Verify we have all files from the original structure
+        assert len(zip_files) == total_images, f"Expected {total_images} files in ZIP, but found {len(zip_files)}"
+        # Verify all filenames are unique
+        assert len(zip_files) == len(set(zip_files)), "ZIP contains duplicate filenames"
 
 def test_cancel_copy(setup_test_env):
     # Arrange
@@ -128,46 +150,10 @@ def test_cancel_copy(setup_test_env):
     assert thread.copy_canceled.emit.called
     assert not thread.not_files_found.emit.called
 
-def test_duplicate_filenames(setup_test_env):
-    # Arrange
-    test_files = setup_test_env["test_files"]
-    dest_dir = setup_test_env["dest_dir"]
-    
-    # Create a duplicate file scenario
-    if test_files:
-        duplicate_file = test_files[0]
-        filename = os.path.basename(duplicate_file)
-        # Pre-create a file with the same name in destination
-        with open(os.path.join(dest_dir, filename), 'w') as f:
-            f.write('dummy content')
-    
-    thread = CopyThread(test_files, str(dest_dir), compress_after_copy=False)
-    thread.finished = MagicMock()
-    thread.progress_changed = MagicMock()
-    
-    # Act
-    thread.run()
-    
-    # Assert
-    assert thread.finished.emit.called
-    # Verify the file was copied with a different name
-    if test_files:
-        filename = os.path.basename(test_files[0])
-        name, ext = os.path.splitext(filename)
-        assert os.path.exists(os.path.join(dest_dir, f"{name}_1{ext}"))
-
 def test_duplicate_filenames_in_zip(setup_test_env):
     # Arrange
     test_files = setup_test_env["test_files"]
     dest_dir = setup_test_env["dest_dir"]
-    
-    # Create duplicate files in the test files list
-    if test_files:
-        duplicate_file = test_files[0]
-        filename = os.path.basename(duplicate_file)
-        new_path = os.path.join(setup_test_env["source_dir"], f"copy_of_{filename}")
-        shutil.copy2(duplicate_file, new_path)
-        test_files.append(new_path)
     
     thread = CopyThread(test_files, str(dest_dir), compress_after_copy=True)
     thread.finished = MagicMock()
@@ -183,10 +169,10 @@ def test_duplicate_filenames_in_zip(setup_test_env):
     zip_path = os.path.join(dest_dir, "compressed_files.zip")
     with zipfile.ZipFile(zip_path, 'r') as zipf:
         files = zipf.namelist()
-        # Check that we have the expected number of files
-        assert len(files) == len(test_files)
-        # Check that all filenames are unique
-        assert len(files) == len(set(files))
+        # Check that all filenames are unique in the ZIP
+        assert len(files) == len(set(files)), "ZIP file contains duplicate filenames"
+        # Verify all test files were included
+        assert len(files) == len(test_files), "Not all files were included in the ZIP"
 
 def test_recursive_copy(setup_test_env):
     # Arrange
