@@ -54,49 +54,49 @@ class TestFileCopy(unittest.TestCase):
         self.file_copy.file_type = FileType.IMAGES
         
         # Test valid image extensions
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.jpg'))
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.png'))
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.jpeg'))
+        self.assertTrue(self.file_copy._should_handle_file('test.jpg'))
+        self.assertTrue(self.file_copy._should_handle_file('test.png'))
+        self.assertTrue(self.file_copy._should_handle_file('test.jpeg'))
         
         # Test invalid extensions
-        self.assertFalse(self.file_copy._FileCopy__should_handle_file('test.mp4'))
-        self.assertFalse(self.file_copy._FileCopy__should_handle_file('test.txt'))
+        self.assertFalse(self.file_copy._should_handle_file('test.mp4'))
+        self.assertFalse(self.file_copy._should_handle_file('test.txt'))
         
     def test_should_handle_file_videos(self):
         self.file_copy.file_type = FileType.VIDEOS
         
         # Test valid video extensions
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.mp4'))
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.avi'))
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.mov'))
+        self.assertTrue(self.file_copy._should_handle_file('test.mp4'))
+        self.assertTrue(self.file_copy._should_handle_file('test.avi'))
+        self.assertTrue(self.file_copy._should_handle_file('test.mov'))
         
         # Test invalid extensions
-        self.assertFalse(self.file_copy._FileCopy__should_handle_file('test.jpg'))
-        self.assertFalse(self.file_copy._FileCopy__should_handle_file('test.txt'))
+        self.assertFalse(self.file_copy._should_handle_file('test.jpg'))
+        self.assertFalse(self.file_copy._should_handle_file('test.txt'))
         
     def test_should_handle_file_images_videos(self):
         self.file_copy.file_type = FileType.IMAGES_VIDEOS
         
         # Test valid extensions
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.jpg'))
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.mp4'))
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.png'))
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.avi'))
+        self.assertTrue(self.file_copy._should_handle_file('test.jpg'))
+        self.assertTrue(self.file_copy._should_handle_file('test.mp4'))
+        self.assertTrue(self.file_copy._should_handle_file('test.png'))
+        self.assertTrue(self.file_copy._should_handle_file('test.avi'))
         
         # Test invalid extensions
-        self.assertFalse(self.file_copy._FileCopy__should_handle_file('test.txt'))
+        self.assertFalse(self.file_copy._should_handle_file('test.txt'))
         
     def test_should_handle_file_custom(self):
         self.file_copy.file_type = FileType.CUSTOM
         self.file_copy.custom_file_types = ('.txt', '.doc')
         
         # Test valid custom extensions
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.txt'))
-        self.assertTrue(self.file_copy._FileCopy__should_handle_file('test.doc'))
+        self.assertTrue(self.file_copy._should_handle_file('test.txt'))
+        self.assertTrue(self.file_copy._should_handle_file('test.doc'))
         
         # Test invalid extensions
-        self.assertFalse(self.file_copy._FileCopy__should_handle_file('test.jpg'))
-        self.assertFalse(self.file_copy._FileCopy__should_handle_file('test.mp4'))
+        self.assertFalse(self.file_copy._should_handle_file('test.jpg'))
+        self.assertFalse(self.file_copy._should_handle_file('test.mp4'))
 
     def test_find_files_to_copy_empty_directory(self):
         # Configure FileCopy
@@ -104,7 +104,7 @@ class TestFileCopy(unittest.TestCase):
         dest_folder = os.path.join(self.temp_dir, 'dest')
         
         # Test with empty directory
-        found_files = self.file_copy._FileCopy__find_files_to_copy(self.temp_dir, dest_folder)
+        found_files = self.file_copy._find_files_to_copy(self.temp_dir, dest_folder)
         self.assertEqual(len(found_files), 0)
         
     def test_find_files_to_copy_with_mixed_files(self):
@@ -117,7 +117,7 @@ class TestFileCopy(unittest.TestCase):
         dest_folder = os.path.join(self.temp_dir, 'dest')
         
         # Get the files that were found
-        found_files = self.file_copy._FileCopy__find_files_to_copy(self.temp_dir, dest_folder)
+        found_files = self.file_copy._find_files_to_copy(self.temp_dir, dest_folder)
         
         # We should only find the image files
         expected_files = [f for f in created_files if os.path.basename(f).lower().endswith(('.jpg', '.png'))]
@@ -134,7 +134,7 @@ class TestFileCopy(unittest.TestCase):
         dest_folder = os.path.join(self.temp_dir, 'dest')
         
         # Get found files
-        found_files = self.file_copy._FileCopy__find_files_to_copy(self.temp_dir, dest_folder)
+        found_files = self.file_copy._find_files_to_copy(self.temp_dir, dest_folder)
         
         # Should find only image files from both directories
         expected_files = [f for f in all_files if os.path.basename(f).lower().endswith(('.jpg', '.png'))]
@@ -156,7 +156,7 @@ class TestFileCopy(unittest.TestCase):
         self.file_copy.file_type = FileType.IMAGES
         
         # Get found files
-        found_files = self.file_copy._FileCopy__find_files_to_copy(self.temp_dir, dest_folder)
+        found_files = self.file_copy._find_files_to_copy(self.temp_dir, dest_folder)
         
         # Should only include source files, not destination files
         self.assertEqual(sorted(found_files), sorted(source_paths))

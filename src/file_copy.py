@@ -16,7 +16,7 @@ class FileCopy(QObject):
 
     def __init__(self):
         super().__init__()
-        self.copy_finished.connect(self.__copy_finished_func)
+        self.copy_finished.connect(self._copy_finished_func)
         self.copy_thread = None
 
     def start_copy(self, copy_options: CopyOptions):
@@ -28,13 +28,13 @@ class FileCopy(QObject):
         if self.is_copying_files():
             return
 
-        to_folder_path = self.__create_folder(self.source)
+        to_folder_path = self._create_folder(self.source)
 
         if to_folder_path is None:
             return
 
         self.to_folder_path = to_folder_path
-        absolute_path_files = self.__find_files_to_copy(self.source, to_folder_path)
+        absolute_path_files = self._find_files_to_copy(self.source, to_folder_path)
 
         if not absolute_path_files:
             # the folder that was created is deleted
@@ -42,7 +42,7 @@ class FileCopy(QObject):
             self.not_files_found.emit()
             return
 
-        self.__start_thread_copy(to_folder_path, absolute_path_files)
+        self._start_thread_copy(to_folder_path, absolute_path_files)
 
     def cancel_copy(self):
         if self.is_copying_files():
@@ -51,11 +51,11 @@ class FileCopy(QObject):
     def is_copying_files(self):
         return self.copy_thread is not None
 
-    def __copy_finished_func(self):
+    def _copy_finished_func(self):
         self.copy_thread = None
-        self.__open_folder(self.to_folder_path)
+        self._open_folder(self.to_folder_path)
 
-    def __start_thread_copy(self, to_folder_path, absolute_path_files):
+    def _start_thread_copy(self, to_folder_path, absolute_path_files):
         self.show_message.emit(
             {
                 "type_message": "Info",
@@ -67,16 +67,16 @@ class FileCopy(QObject):
         )
         self.copy_thread.progress_changed.connect(self.progress_changed)
         self.copy_thread.finished.connect(self.copy_finished)
-        self.copy_thread.copy_canceled.connect(self.__cancel_copy_emit)
+        self.copy_thread.copy_canceled.connect(self._cancel_copy_emit)
         self.copy_thread.start()
 
-    def __cancel_copy_emit(self):
+    def _cancel_copy_emit(self):
         self.copy_thread.quit()
         self.copy_thread.wait()
         self.copy_thread = None
         self.copy_canceled.emit()
 
-    def __open_folder(self, folder_path):
+    def _open_folder(self, folder_path):
         operating_system = platform.system()
         if operating_system == "Windows":
             os.startfile(folder_path)
@@ -85,18 +85,18 @@ class FileCopy(QObject):
         else:
             print("Unsupported operating system.")
 
-    def __create_folder(self, source_folder_path: str):
-        folder_name = "folder_" + self.__generate_unique_name()
+    def _create_folder(self, source_folder_path: str):
+        folder_name = "folder_" + self._generate_unique_name()
         folder_path = os.path.join(source_folder_path, folder_name)
         os.makedirs(folder_path)
         return folder_path
 
-    def __generate_unique_name(self, length=5):
+    def _generate_unique_name(self, length=5):
         characters = string.ascii_letters + string.digits
         unique_name = "".join(random.choice(characters) for _ in range(length))
         return unique_name
 
-    def __find_files_to_copy(self, source_folder_path: str, to_folder_path: str) -> list:
+    def _find_files_to_copy(self, source_folder_path: str, to_folder_path: str) -> list:
         """
         finds and returns a list of absolute file paths in the source directory that should be copied.
 
@@ -109,12 +109,12 @@ class FileCopy(QObject):
                 # avoid the folder that was created
                 continue
             for file in files:
-                if self.__should_handle_file(file):
+                if self._should_handle_file(file):
                     abs_path = os.path.join(root, file)
                     files_to_copy.append(abs_path)
         return files_to_copy
 
-    def __should_handle_file(self, filename: str):
+    def _should_handle_file(self, filename: str):
         file_extensions: tuple
         match self.file_type:
             case FileType.IMAGES:
