@@ -17,9 +17,9 @@ options = {
 }
 
 setup(
-    name="YourAppName",
+    name="RecursiveFilesCopier",
     version="1.0",
-    description="Your application description",
+    description="A tool to copy files recursively based on file types",
     options=options,
     executables=executables,
 )
