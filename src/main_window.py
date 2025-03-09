@@ -6,13 +6,10 @@ from .file_options import FileType
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, base_dir):
         super().__init__()
-        # base_dir = os.path.dirname(os.path.abspath(__file__))
-        base_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-        filename = "src/main.ui"
-        absolute_path = os.path.join(base_dir, filename)
-        uic.loadUi(absolute_path, self)
+        ui_file = os.path.join(base_dir, "src", "main.ui")
+        uic.loadUi(ui_file, self)
         self.progressBar.hide()
         self.customLineEdit.hide()
         self._init_Combo_box()
