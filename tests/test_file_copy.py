@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 import os
 import tempfile
 import shutil
-from src.file_copy import FileCopy, FileType, CopyOptions
+from src.file_copy import FileCopy, FileType
 
 class TestFileCopy(unittest.TestCase):
     def setUp(self):
